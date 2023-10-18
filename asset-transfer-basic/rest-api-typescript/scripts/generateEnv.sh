@@ -9,12 +9,12 @@ ${AS_LOCAL_HOST:=true}
 : "${TEST_NETWORK_HOME:=../../test-network}"
 : "${CONNECTION_PROFILE_FILE_ORG1:=${TEST_NETWORK_HOME}/organizations/peerOrganizations/org1.example.com/connection-org1.json}"
 : "${CERTIFICATE_FILE_ORG1:=${TEST_NETWORK_HOME}/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/cert.pem}"
-: "${PRIVATE_KEY_FILE_ORG1:=${TEST_NETWORK_HOME}/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/86a1e221e1cd633a3ae5b6a39581acd238586ea52e15fa1af5e8b4edb69d37fb_sk}"
+: "${PRIVATE_KEY_FILE_ORG1:=${TEST_NETWORK_HOME}/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/8c3ffc943fdb42c29ac327a104c30867b24016ecf71935095d30270bdfa02401_sk}"
 
 
 : "${CONNECTION_PROFILE_FILE_ORG2:=${TEST_NETWORK_HOME}/organizations/peerOrganizations/org2.example.com/connection-org2.json}"
 : "${CERTIFICATE_FILE_ORG2:=${TEST_NETWORK_HOME}/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/signcerts/cert.pem}"
-: "${PRIVATE_KEY_FILE_ORG2:=${TEST_NETWORK_HOME}/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/keystore/26b5597d09c60a9d4c62a01c35505816fdca71e7889ae8cd560b720bd6304085_sk}"
+: "${PRIVATE_KEY_FILE_ORG2:=${TEST_NETWORK_HOME}/organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com/msp/keystore/3b69ce07941b32c2615d5c2cee7c039279df5f1278c28435a66e254e0daa9467_sk}"
 
 
 cat << ENV_END > .env

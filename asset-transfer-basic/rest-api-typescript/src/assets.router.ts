@@ -58,12 +58,12 @@ assetsRouter.get('/', async (req: Request, res: Response) => {
 assetsRouter.post(
   '/',
   body().isObject().withMessage('body must contain an asset object'),
-  body('VIN', 'must be a string').notEmpty(),
-  body('Make', 'must be a string').notEmpty(),
-  body('Model', 'must be a string').notEmpty(),
-  body('Year', 'must be a number').isNumeric(),
-  body('Owner', 'must be a string').notEmpty(),
-  body('AppraisedValue', 'must be a number').isNumeric(),
+  body('product_id', 'must be a string').notEmpty(),
+  body('supplier_id', 'must be a string').notEmpty(),
+  body('part_name', 'must be a string').notEmpty(),
+  body('expected_shipment_date', 'must be a string').notEmpty(),
+  body('shipment_method_type', 'must be a string').notEmpty(),
+  body('appraisedValue', 'must be a number').isNumeric(),
   async (req: Request, res: Response) => {
     logger.debug(req.body, 'Create asset request received');
 
@@ -79,7 +79,7 @@ assetsRouter.post(
     }
 
     const mspId = req.user as string;
-    const assetId = req.body.VIN;
+    const assetId = req.body.product_id;
 
     try {
       const submitQueue = req.app.locals.jobq as Queue;
@@ -88,11 +88,11 @@ assetsRouter.post(
         mspId,
         'CreateAsset',
         assetId,
-        req.body.Make,
-        req.body.Model,
-        req.body.Year,
-        req.body.Owner,
-        req.body.AppraisedValue
+        req.body.supplier_id,
+        req.body.part_name,
+        req.body.expected_shipment_date,
+        req.body.shipment_method_type,
+        req.body.appraisedValue
       );
 
       return res.status(ACCEPTED).json({
@@ -191,12 +191,12 @@ assetsRouter.get('/:assetId', async (req: Request, res: Response) => {
 assetsRouter.put(
   '/:assetId',
   body().isObject().withMessage('body must contain an asset object'),
-  body('VIN', 'must be a string').notEmpty(),
-  body('Make', 'must be a string').notEmpty(),
-  body('Model', 'must be a string').notEmpty(),
-  body('Year', 'must be a number').isNumeric(),
-  body('Owner', 'must be a string').notEmpty(),
-  body('AppraisedValue', 'must be a number').isNumeric(),
+  body('product_id', 'must be a string').notEmpty(),
+  body('supplier_id', 'must be a string').notEmpty(),
+  body('part_name', 'must be a string').notEmpty(),
+  body('expected_shipment_date', 'must be a string').notEmpty(),
+  body('shipment_method_type', 'must be a string').notEmpty(),
+  body('appraisedValue', 'must be a number').isNumeric(),
   async (req: Request, res: Response) => {
     logger.debug(req.body, 'Update asset request received');
 
@@ -211,7 +211,7 @@ assetsRouter.put(
       });
     }
 
-    if (req.params.assetId != req.body.VIN) {
+    if (req.params.assetId != req.body.product_id) {
       return res.status(BAD_REQUEST).json({
         status: getReasonPhrase(BAD_REQUEST),
         reason: 'ASSET_ID_MISMATCH',
@@ -230,11 +230,11 @@ assetsRouter.put(
         mspId,
         'UpdateAsset',
         assetId,
-        req.body.Make,
-        req.body.Model,
-        req.body.Year,
-        req.body.Owner,
-        req.body.AppraisedValue
+        req.body.supplier_id,
+        req.body.part_name,
+        req.body.expected_shipment_date,
+        req.body.shipment_method_type,
+        req.body.appraisedValue
       );
 
       return res.status(ACCEPTED).json({
@@ -266,8 +266,8 @@ assetsRouter.patch(
     })
     .withMessage('body must contain an array with a single patch operation'),
   body('*.op', "operation must be 'replace'").equals('replace'),
-  body('*.path', "path must be '/Owner'").equals('/Owner'),
-  body('*.value', 'must be a string').isString(),
+  body('*.path', "path must be '/quantity'").equals('/quantity'),
+  body('*.value', 'must be a number').isNumeric(),
   async (req: Request, res: Response) => {
     logger.debug(req.body, 'Transfer asset request received');
 
@@ -284,7 +284,7 @@ assetsRouter.patch(
 
     const mspId = req.user as string;
     const assetId = req.params.assetId;
-    const newOwner = req.body[0].value;
+    const quantity = req.body[0].value;
 
     try {
       // const data = await postData(assetId);
@@ -295,7 +295,7 @@ assetsRouter.patch(
         mspId,
         'TransferAsset',
         assetId,
-        newOwner
+        quantity
       );
 
       return res.status(ACCEPTED).json({
