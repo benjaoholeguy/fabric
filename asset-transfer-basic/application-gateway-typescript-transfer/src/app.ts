@@ -35,7 +35,9 @@ const peerHostAlias = envOrDefault('PEER_HOST_ALIAS', 'peer0.org1.example.com');
 
 const utf8Decoder = new TextDecoder();
 // const assetId = `asset${Date.now()}`;
-const assetVin = '1N6AD0CU6CN312965';
+const assetId = '01HCZX3EZRQW1XWAM0DYMRW8RE';
+
+const quantity = '3';
 
 async function main(): Promise<void> {
 
@@ -80,7 +82,7 @@ async function main(): Promise<void> {
         // await createAsset(contract);
 
         // Update an existing asset asynchronously.
-        await transferAssetAsync(contract);
+        await transferAssetAsync(contract, "3");
 
         // Get the asset details by assetID.
         // await readAssetByID(contract);
@@ -160,7 +162,7 @@ async function createAsset(contract: Contract): Promise<void> {
         'CreateAsset',
         // assetId,
         // 'JH4CL95847C421699',
-        assetVin,
+        assetId,
         'Toyota',
         '4Runner',
         '2007',
@@ -175,20 +177,20 @@ async function createAsset(contract: Contract): Promise<void> {
  * Submit transaction asynchronously, allowing the application to process the smart contract response (e.g. update a UI)
  * while waiting for the commit notification.
  */
-async function transferAssetAsync(contract: Contract): Promise<void> {
+async function transferAssetAsync(contract: Contract, quantity: string): Promise<void> {
     console.log('\n--> Async Submit Transaction: TransferAsset, updates existing asset owner');
 
-    const newOwner = 'Maite';
-
+    // const newOwner = 'Bielsa';
+    
     try{
 
         const commit = await contract.submitAsync('TransferAsset', {
-            arguments: [assetVin, newOwner],
+            arguments: [assetId, quantity],
         });
         
-        const oldOwner = utf8Decoder.decode(commit.getResult());
+        const newAsset = utf8Decoder.decode(commit.getResult());
     
-        console.log(`*** Successfully submitted transaction to transfer ownership from ${oldOwner} to ${newOwner}`);
+        console.log(`*** Successfully submitted transaction for this asset ${newAsset}`);
         console.log('*** Waiting for transaction commit');
     
         const status = await commit.getStatus();
@@ -208,7 +210,7 @@ async function transferAssetAsync(contract: Contract): Promise<void> {
 async function readAssetByID(contract: Contract): Promise<void> {
     console.log('\n--> Evaluate Transaction: ReadAsset, function returns asset attributes');
 
-    const resultBytes = await contract.evaluateTransaction('ReadAsset', assetVin);
+    const resultBytes = await contract.evaluateTransaction('ReadAsset', assetId);
 
     const resultJson = utf8Decoder.decode(resultBytes);
     const result = JSON.parse(resultJson);
