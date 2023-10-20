@@ -139,8 +139,30 @@ function parseJson(jsonBytes: Uint8Array): unknown {
 //     console.log('\n*** UpdateAsset committed successfully');
 // }
 
-async function updateAsset(contract: Contract): Promise<void> {
-    console.log(`\n--> Submit transaction: UpdateAsset, ${assetId} updated location and expected_shipment_date, shipment_date, and appraisedValue`);
+// async function updateAsset(contract: Contract): Promise<void> {
+//     console.log(`\n--> Submit transaction: UpdateAsset, ${assetId} updated location and expected_shipment_date, shipment_date, and appraisedValue`);
+
+//     // if(await data.shipment_date > asset.expected_shipment_date){
+//     //     asset.appraisedValue = asset.appraisedValue*0.95; 
+//     //     await ctx.stub.putState(asset.product_id, Buffer.from(stringify(sortKeysRecursive(asset))));
+//     // }else{
+//     //     asset.appraisedValue = asset.appraisedValue*1.05;
+//     //     await ctx.stub.putState(asset.product_id, Buffer.from(stringify(sortKeysRecursive(asset))));
+//     // }
+//     const r = await CallOracle();
+
+//     const data = JSON.parse(r);
+    
+//     console.log(`This is data: ${data.shipment_date_str} and the type ${typeof(data.shipment_date_str)}`);
+
+//     await contract.submitTransaction('UpdateAsset', assetId, '01HCZX3EZRH5J621GD8K2EJJEC', 'radiator', 'Ship', '84.7', data.shipment_date_str, '', '-8.6708785', '39.6288756', data.quantity);
+
+//     console.log('\n*** UpdateAsset committed successfully');
+// }
+
+// OracleUpdateAsset(ctx, id, shipment_date, longitude, latitude) 
+async function oracleUpdateAsset(contract: Contract): Promise<void> {
+    console.log(`\n--> Submit transaction: oracleUpdateAsset, ${assetId}`);
 
     // if(await data.shipment_date > asset.expected_shipment_date){
     //     asset.appraisedValue = asset.appraisedValue*0.95; 
@@ -149,13 +171,13 @@ async function updateAsset(contract: Contract): Promise<void> {
     //     asset.appraisedValue = asset.appraisedValue*1.05;
     //     await ctx.stub.putState(asset.product_id, Buffer.from(stringify(sortKeysRecursive(asset))));
     // }
-    const r = await CallOracle();
+    const r = await CallOracle(assetId);
 
     const data = JSON.parse(r);
     
-    console.log(`This is data: ${data.shipment_date_str} and the type ${typeof(data.shipment_date_str)}`);
+    console.log(`This is data: ${data.shipment_date} and the type ${typeof(data.shipment_date)}`);
 
-    await contract.submitTransaction('UpdateAsset', assetId, '01HCZX3EZRH5J621GD8K2EJJEC', 'radiator', 'Ship', '84.7', data.shipment_date_str, '', '-8.6708785', '39.6288756', data.quantity);
+    await contract.submitTransaction('OracleUpdateAsset', assetId, data.shipment_date, data.part_location.longitude, data.part_location.latitude);
 
     console.log('\n*** UpdateAsset committed successfully');
 }
@@ -190,7 +212,15 @@ async function replayChaincodeEvents(network: Network, contract: Contract, start
             console.log(`\n<-- Chaincode event replayed: ${event.eventName} -`, payload);
             if (event.eventName === 'TransferAsset') { 
                 // const data = await CallOracle();
-                updateAsset(contract);
+                // updateAsset(contract);
+                oracleUpdateAsset(contract);
+                
+            }
+
+            if (event.eventName === 'UpdateAsset') { 
+                // const data = await CallOracle();
+                // updateAsset(contract);
+                oracleUpdateAsset(contract);
                 
             }
             
@@ -204,37 +234,69 @@ async function replayChaincodeEvents(network: Network, contract: Contract, start
     }
 }
 
-async function CallOracle(): Promise<any> {
+async function CallOracle(id: string): Promise<any> {
     // const asset = JSON.parse(assetString);
     // const id = asset.product_id;
-    const data = {
-        "product_id": "01HD5803VTVE9B658506T86CFA",
-        "supplier_id": "01HD5803VTD85XT9DNN2116397",
-        "part_name": "oil filter",
-        "shipment_date": "2023-12-27T02:25:28Z",
-        "shipment_method_type": "Ship",
-        "part_location": {
-          "longitude": "52.9009502",
-          "latitude": "36.6454207"
-        },
-        "quantity": "",
-        "apprisedValue": "10.11",
-        "shipment_date_str": "2023-11-01",
-        "shipment_test": false
-      };
-    // console.log(`This is the data: ${typeof(new Date(data.shipment_date))} of ${data.shipment_date} *********--------`);
-    return JSON.stringify(data);
+    // const data = {
+    //     "product_id": "01HD5803VTVE9B658506T86CFA",
+    //     "supplier_id": "01HD5803VTD85XT9DNN2116397",
+    //     "part_name": "oil filter",
+    //     "shipment_date": "2023-12-27T02:25:28Z",
+    //     "shipment_method_type": "Ship",
+    //     "part_location": {
+    //       "longitude": "52.9009502",
+    //       "latitude": "36.6454207"
+    //     },
+    //     "quantity": "",
+    //     "apprisedValue": "10.11",
+    //     "shipment_date_str": "2023-11-01",
+    //     "shipment_test": false
+    //   };
+    // // console.log(`This is the data: ${typeof(new Date(data.shipment_date))} of ${data.shipment_date} *********--------`);
+    // return JSON.stringify(data);
+    // try {
+    //     const apiKey = '795eb1c0';
+    //     const response = await fetch('https://my.api.mockaroo.com/supply_chain.json', {
+    //         method: 'POST',
+    //         headers: {
+    //         'X-API-KEY': apiKey
+    //         },
+    //         // body: JSON.stringify({id})
+    //     });
+    //         // .then((response) => response.json())
+    //         // .then(async (data)=>{
+    //             // data
+    //             // asset.shipment_date = data.shipment_date_str;
+    //             // asset.longitude = data.part_location.longitude;
+    //             // asset.latitude = data.part_location.latitude;
+    //             // asset.quantity = quantity;
+    //             // asset.shipment_test = await data.shipment_test;
+    //             // asset.appraisedValue = (new Date(data.shipment_date) > new Date(asset.expected_shipment_date)) ? asset.appraisedValue*0.95 : asset.appraisedValue*1.05;
+    //             // if(await data.shipment_date > asset.expected_shipment_date){
+    //             //     asset.appraisedValue = asset.appraisedValue*0.95; 
+    //             //     await ctx.stub.putState(asset.product_id, Buffer.from(stringify(sortKeysRecursive(asset))));
+    //             // }else{
+    //             //     asset.appraisedValue = asset.appraisedValue*1.05;
+    //             //     await ctx.stub.putState(asset.product_id, Buffer.from(stringify(sortKeysRecursive(asset))));
+    //             // }
+    //             // return data;
+    //         // })
+    //     if(!response.ok){
+    //         throw new Error(`Error! status: ${response.status}`)
+    //     }    
+    //     const data = await response.json();
+       
+    //     // console.log(`This is the data: ${typeof(new Date(data.shipment_date))} of ${data.shipment_date} *********--------`);
+    //     return data;
     try {
-        const apiKey = '795eb1c0';
-        const response = await fetch('https://my.api.mockaroo.com/supply_chain.json', {
-            method: 'POST',
-            headers: {
-            'X-API-KEY': apiKey
-            },
+        
+        const data = await fetch(`http://127.0.0.1:4001/oracle?product_id=${id}`, {
+            method: 'GET',
+            
             // body: JSON.stringify({id})
-        });
-            // .then((response) => response.json())
-            // .then(async (data)=>{
+        })
+            .then((response) => response.json())
+            .then(async (data)=>{
                 // data
                 // asset.shipment_date = data.shipment_date_str;
                 // asset.longitude = data.part_location.longitude;
@@ -249,15 +311,15 @@ async function CallOracle(): Promise<any> {
                 //     asset.appraisedValue = asset.appraisedValue*1.05;
                 //     await ctx.stub.putState(asset.product_id, Buffer.from(stringify(sortKeysRecursive(asset))));
                 // }
-                // return data;
-            // })
-        if(!response.ok){
-            throw new Error(`Error! status: ${response.status}`)
-        }    
-        const data = await response.json();
+                return data;
+            })
+        // if(!response.ok){
+        //     throw new Error(`Error! status: ${response.status}`)
+        // }    
+        // const data = await responseServer();
        
-        // console.log(`This is the data: ${typeof(new Date(data.shipment_date))} of ${data.shipment_date} *********--------`);
-        return data;
+        console.log(`This is the data: ${typeof(new Date(data.shipment_date))} of ${data.shipment_date} *********--------`);
+        return JSON.stringify(data);
     } catch (error) {
         console.log('*** Successfully caught the error: \n', error);
     } 

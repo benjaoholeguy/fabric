@@ -128,7 +128,7 @@ async function createAsset(contract: Contract): Promise<bigint> {
 async function updateAsset(contract: Contract): Promise<void> {
     console.log(`\n--> Submit transaction: UpdateAsset, ${assetId} updated location and expected_shipment_date, shipment_date, and appraisedValue`);
 
-    await contract.submitTransaction('UpdateAsset', assetId, '01HCZX3EZRH5J621GD8K2EJJEC', 'radiator', 'Ship', '184.7', '', '2024-01-15', '-8.6708785', '39.6288756', '10');
+    await contract.submitTransaction('UpdateAsset', assetId, '01HCZX3EZRH5J621GD8K2EJJEC', 'radiator', 'Ship', '','23');
 
     console.log('\n*** UpdateAsset committed successfully');
 }
