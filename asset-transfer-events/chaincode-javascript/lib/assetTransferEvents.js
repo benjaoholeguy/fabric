@@ -114,12 +114,12 @@ class AssetTransferEvents extends Contract {
 		asset.supplier_id = supplier_id;
 		asset.part_name = part_name;
 		asset.shipment_date = shipment_date;
-		asset.expected_shipment_date = expected_shipment_date;
+		asset.expected_shipment_date = (expected_shipment_date == "") ? asset.expected_shipment_date : expected_shipment_date;
 		asset.shipment_method_type = shipment_method_type;
 		asset.longitude = longitude;
 		asset.latitude = latitude;
-		asset.quantity = quantity;
-		asset.appraisedValue = appraisedValue;
+		asset.quantity = (quantity == "") ? asset.quantity : quantity;
+		asset.appraisedValue = (new Date(shipment_date) > new Date(asset.expected_shipment_date)) ?  appraisedValue*1.05 : appraisedValue*0.95;
 		const assetBuffer = Buffer.from(JSON.stringify(asset));
 		await savePrivateData(ctx, id);
 
